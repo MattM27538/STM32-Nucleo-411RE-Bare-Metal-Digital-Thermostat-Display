@@ -31,8 +31,8 @@ void resetSysTickCSRRegister(){
 	SysTick->CTRL = 0;
 }
 
-//TODO: create interface to refactor both delays
-void delayuS(const int numberOfMicroSeconds){
+//TODO: refactor both delays
+void delayMicroSeconds(const int numberOfMicroSeconds){
 	const uint32_t clockCyclesPerMillisecond = 16;
 
 	setDelayTime(clockCyclesPerMillisecond);
@@ -48,7 +48,7 @@ void delayuS(const int numberOfMicroSeconds){
 	resetSysTickCSRRegister();
 }
 
-void delay(const int numberOfMilliSeconds){
+void delayMilliSeconds(const int numberOfMilliSeconds){
 	const uint32_t clockCyclesPerMillisecond = 16000;
 	
 	setDelayTime(clockCyclesPerMillisecond);
@@ -56,6 +56,7 @@ void delay(const int numberOfMilliSeconds){
 	resetSysTickCounter();
 
 	setClockSourceToProcessorClock();
+
 	enableSysTickCounter();
 
 	runSysTickDelay(numberOfMilliSeconds);
