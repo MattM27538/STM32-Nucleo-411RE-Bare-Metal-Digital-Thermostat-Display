@@ -1,6 +1,8 @@
 #include "dht11.h"
 #include "stm32f4xx.h"
 #include "delay.h"
+#include <oled.h>
+#include <stdbool.h>
 
 void enablePinA8ForDHT11(){
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
@@ -23,27 +25,56 @@ void setPinPA8AsInput(){
 	GPIOA->MODER &= ~GPIO_MODER_MODE8;
 }
 
-void dht11_start(void){
+void dht11Start(){
 	setPinPA8AsOutput();
 
 	setPinPA8Low();
 
-	delay(18);
+	delayMilliSeconds(18);
 
-	setPinPA8AsInput()
+	setPinPA8AsInput();
 }
 
 bool pinPA8IsHigh(){
 	return GPIOA->IDR & GPIO_IDR_ID8;
 }
 
+void runDHT11(DHT11Data temperatureAndHumidity, char* oledBuffer){
+	enablePinA8ForDHT11();
+
+	while(true){
+		dht11Start();
+
+		if(getDHT11StartResponse() == dht11StartSuccess){
+			getDHTData(&temperatureAndHumidity.temperature, &temperatureAndHumidity.humidity);
+
+			sprintf(oledBuffer, "Temp = %0.1f", temperatureAndHumidity.temperature);
+
+			SSD1306_GotoXY (0, 20);
+			SSD1306_Puts(oledBuffer, &Font_11x18, 1);
+
+			sprintf(oledBuffer, "Humi = %0.1f", temperatureAndHumidity.humidity);
+			
+			SSD1306_GotoXY (0, 40);
+			SSD1306_Puts(oledBuffer, &Font_11x18, 1);
+
+			SSD1306_UpdateScreen();
+		}
+		else{
+			sprintf(oledBuffer,"DHT Error");
+		}
+
+		delayMilliSeconds(1000);
+	}
+}
+
 DHT11Response getDHT11StartResponse(){
 	uint8_t DHT11Response = 0;
 	
-	delayuS(40);
+	delayMicroSeconds(40);
 
 	if (!(pinPA8IsHigh())){
-		delayuS(80);
+		delayMicroSeconds(80);
 
 		if (pinPA8IsHigh()){
 			DHT11Response = dht11StartSuccess;
@@ -63,7 +94,7 @@ static uint8_t dht11ReadData(){
 	for (uint8_t j = 0; j < numberOfBitsDHT11Sends; ++j){
 		while (!pinPA8IsHigh()){}
 		
-		delayuS (40);
+		delayMicroSeconds (40);
 
 		const int bitPositionToWriteTo = numberOfBitsDHT11Sends - j - 1;
 

@@ -8,6 +8,13 @@ typedef enum{
 	dht11StartError = 1
 } DHT11Response;
 
+typedef struct{
+	float temperature;
+	float humidity;	
+} DHT11Data;
+
+void runDHT11();
+
 void enablePinA8ForDHT11();
 
 void dht11Start();
