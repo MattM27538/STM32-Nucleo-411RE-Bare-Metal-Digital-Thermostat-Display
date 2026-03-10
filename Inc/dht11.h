@@ -15,8 +15,6 @@ typedef struct{
 
 void runDHT11();
 
-void enablePinA8ForDHT11();
-
 void dht11Start();
 
 DHT11Response getDHT11StartResponse();
