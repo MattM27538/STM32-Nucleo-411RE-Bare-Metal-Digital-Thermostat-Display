@@ -4,14 +4,6 @@
 #include <oled.h>
 #include <stdbool.h>
 
-void enablePinA8ForDHT11(){
-	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
-}
-
-void enableGPIOA(){
-	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
-}
-
 void setPinPA8AsOutput(){
 	GPIOA->MODER |= GPIO_MODER_MODE8_0;
 	GPIOA->MODER &= ~GPIO_MODER_MODE8_1;
@@ -35,8 +27,8 @@ void dht11Start(){
 	setPinPA8AsInput();
 }
 
-bool pinPA8IsHigh(){
-	return GPIOA->IDR & GPIO_IDR_ID8;
+void enablePinA8ForDHT11(){
+	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
 }
 
 void runDHT11(DHT11Data temperatureAndHumidity, char* oledBuffer){
@@ -66,6 +58,10 @@ void runDHT11(DHT11Data temperatureAndHumidity, char* oledBuffer){
 
 		delayMilliSeconds(1000);
 	}
+}
+
+bool pinPA8IsHigh(){
+	return GPIOA->IDR & GPIO_IDR_ID8;
 }
 
 DHT11Response getDHT11StartResponse(){
