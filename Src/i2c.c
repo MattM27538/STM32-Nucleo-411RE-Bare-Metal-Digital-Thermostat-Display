@@ -145,3 +145,39 @@ void i2cWriteByte(const uint8_t controllerAddress, const uint8_t targetAddress, 
 
     stopI2CBus();
 }
+
+void writeBytes(const char *dataBuffer, const uint16_t dataBufferLength){
+    for (uint16_t i = 0; i < dataBufferLength; ++i){ 
+        I2C1->DR = dataBuffer[i];
+        while(!(dataTransferCompleted())){
+        }
+    }	
+}
+
+void i2cWriteMultipleBytes(const uint8_t controllerAddress, const uint8_t targetAddress, const char *dataBuffer, const uint16_t dataBufferLength){
+    while(i2cBusIsBusy()){
+    }
+
+    startI2CBus();
+
+    while(!(startCommandAcknowledged())){
+    }
+
+    setI2CTargetAddressAndWritebit(targetAddress);
+
+    while(!(targetAddressAcknowledged())){
+    }
+
+    clearAddressFlag();
+
+    while(!(dataRegisterIsEmpty())){
+    }
+
+    setI2CControllerAddress(controllerAddress);
+
+    while(!(dataRegisterIsEmpty()));
+
+    writeBytes(dataBuffer, dataBufferLength);
+                                
+    stopI2CBus();
+}
